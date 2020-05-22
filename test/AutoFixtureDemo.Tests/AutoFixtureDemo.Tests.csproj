@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Microsoft.Build.CentralPackageVersions" />
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AutoFixtureDemo\AutoFixtureDemo.csproj" />
+  </ItemGroup>
+
+</Project>
