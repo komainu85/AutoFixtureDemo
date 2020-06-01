@@ -8,33 +8,28 @@ using System.Reflection;
 
 namespace AutoFixtureDemo.Tests
 {
-    public class AutoMoqDataAttribute : AutoDataAttribute
+   public class AutoMoqDataAttribute : AutoDataAttribute
     {
-        private readonly string _setupName;
+        private readonly string[] _setupNames;
 
         private const string AutoSetupName = "AutoSetup";
 
-        public AutoMoqDataAttribute()
-            : base(() => CreateFixture())
+        public AutoMoqDataAttribute(params string[] setupNames)
+            : base(CreateFixture)
         {
-
-        }
-
-        public AutoMoqDataAttribute(string setupName)
-            : base(() => CreateFixture())
-        {
-            _setupName = setupName;
+            _setupNames = setupNames;
         }
 
         public override IEnumerable<object[]> GetData(MethodInfo testMethod)
         {
-            var fields = testMethod.DeclaringType.GetProperties();
+            if (testMethod.DeclaringType != null)
+            {
+                var fields = testMethod.DeclaringType.GetProperties();
 
-            var autoSetup = fields.SingleOrDefault(x => x.PropertyType == typeof(Action<IFixture>) && x.Name == AutoSetupName)?.GetValue(null) as Action<IFixture>;
-            var namedSetup = fields.SingleOrDefault(x => x.PropertyType == typeof(Action<IFixture>) && x.Name == _setupName)?.GetValue(null) as Action<IFixture>;
+                RunAutoSetup(fields);
 
-            autoSetup?.Invoke(Fixture);
-            namedSetup?.Invoke(Fixture);
+                RunNamedSetups(fields);
+            }
 
             return base.GetData(testMethod);
         }
@@ -45,7 +40,31 @@ namespace AutoFixtureDemo.Tests
 
             fixture.Customize(new AutoMoqCustomization() { GenerateDelegates = true });
 
+            fixture.Register(() => fixture);
+
             return fixture;
+        }
+
+        private void RunNamedSetups(PropertyInfo[] fields)
+        {
+            if (_setupNames == null) return;
+            foreach (var setupName in _setupNames)
+            {
+                var namedSetup =
+                    fields.SingleOrDefault(x => x.PropertyType == typeof(Action<IFixture>) && x.Name == setupName)
+                        ?.GetValue(null) as Action<IFixture>;
+
+                namedSetup?.Invoke(Fixture);
+            }
+        }
+
+        private void RunAutoSetup(PropertyInfo[] fields)
+        {
+            var autoSetup =
+                fields.SingleOrDefault(x => x.PropertyType == typeof(Action<IFixture>) && x.Name == AutoSetupName)
+                    ?.GetValue(null) as Action<IFixture>;
+
+            autoSetup?.Invoke(Fixture);
         }
     }
 }
