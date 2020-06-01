@@ -56,14 +56,18 @@ namespace AutoFixtureDemo.Tests
             databaseProvider.Verify(x => x.SaveAsync(), Times.Once);
         }
 
+        //Using Fixture within a test
         [Theory]
         [AutoMoqData]
         public async Task SaveCity_WithValidData_CallsAddCity(
-            [Frozen]Mock<IDatabaseProvider> databaseProvider,
+            [Frozen] Mock<IDatabaseProvider> databaseProvider,
             CityRepository sut,
             string cityName,
-            Country country)
+            Fixture fixture)
         {
+            //Arrange
+            var country = fixture.Create<Country>();
+
             //Act
             await sut.SaveCity(cityName, country);
 
