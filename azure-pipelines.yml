@@ -28,30 +28,13 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
+- task: DotNetCoreCLI@2 
   inputs:
-    testSelector: 'testAssemblies'
-    testAssemblyVer2: |
-      **\*test*.dll
-      !**\*TestAdapter.dll
-      !**\obj\**
-    searchFolder: '$(System.DefaultWorkingDirectory)'
-    codeCoverageEnabled: true
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: PublishTestResults@2
-  displayName: 'Tests: Publish unit tests'
-  condition: succeededOrFailed()
-  inputs:
-    testRunTitle: Unit Tests
-    testRunner: vstest
-    testResultsFiles: '$(ArtifactsPath)/**/*.trx'
+    command: 'test'
+    arguments: '–configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)\TestResults\Coverage\'
 
 - task: PublishCodeCoverageResults@1
-  displayName: "Tests: Publish unit test coverage"
-  condition: succeededOrFailed()
   inputs:
-    codeCoverageTool: Cobertura
-    summaryFileLocation: '$(ArtifactsPath)/**/*.cobertura.xml'
-    reportDirectory: '$(ArtifactsPath)/tests/coveragereport'
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/*cobertura.xml'
+    reportDirectory: '($(Build.SourcesDirectory)/TestResults/Coverage'
