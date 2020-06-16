@@ -34,14 +34,7 @@ steps:
     projects: 'test/**/*.csproj'
     arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
     nobuild: true
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'custom'
-    projects: 'test/**/*.csproj'
-    custom: 'tool'
-    arguments: 'install dotnet-reportgenerator-globaltool --tool-path . --version 4.6.1'
-
+    
 - task: DotNetCoreCLI@2
   displayName: Install ReportGenerator tool
   inputs:
