@@ -19,6 +19,6 @@
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="3.1.*"/>
     <PackageReference Update="xunit" Version="2.4.*"/>
     <PackageReference Update="xunit.runner.visualstudio" Version="2.4.*" PrivateAssets="All"  />
-    
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.*"   />
   </ItemGroup>
 </Project>
