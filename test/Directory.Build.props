@@ -11,6 +11,11 @@
     <NoWarn>$(NoWarn);SA0001</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup Label="Coverage">
+    <CollectCoverage>true</CollectCoverage>
+    <VSTestLogger>trx</VSTestLogger>
+    <VSTestCollect>XPlat Code Coverage</VSTestCollect>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
@@ -22,5 +27,7 @@
     <PackageReference Include="AutoFixture.AutoMoq" />
     <PackageReference Include="AutoFixture.Idioms" />
     <PackageReference Include="AutoFixture.Xunit2" />
+    <PackageReference Include="coverlet.msbuild" />
+    <PackageReference Include="coverlet.collector" />
   </ItemGroup>
 </Project>
