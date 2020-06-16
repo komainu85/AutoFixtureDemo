@@ -39,3 +39,19 @@ steps:
     codeCoverageEnabled: true
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: PublishTestResults@2
+  displayName: 'Tests: Publish unit tests'
+  condition: succeededOrFailed()
+  inputs:
+    testRunTitle: Unit Tests
+    testRunner: vstest
+    testResultsFiles: '$(ArtifactsPath)/**/*.trx'
+
+- task: PublishCodeCoverageResults@1
+  displayName: "Tests: Publish unit test coverage"
+  condition: succeededOrFailed()
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(ArtifactsPath)/**/*.cobertura.xml'
+    reportDirectory: '$(ArtifactsPath)/tests/coveragereport'
