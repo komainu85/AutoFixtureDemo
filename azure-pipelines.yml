@@ -31,10 +31,29 @@ steps:
 - task: DotNetCoreCLI@2 
   inputs:
     command: 'test'
-    arguments: '/p:CollectCoverage=true /p:CoverletOputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)\TestResults\Coverage\'
+    projects: 'test/**/*.csproj'
+    arguments: '/p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+    nobuild: true
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'custom'
+    projects: 'test/**/*.csproj'
+    custom: 'tool'
+    arguments: 'install dotnet-reportgenerator-globaltool --tool-path . --version 4.6.1'
+
+- task: DotNetCoreCLI@2
+  displayName: Install ReportGenerator tool
+  inputs:
+    command: custom
+    custom: tool
+    arguments: install --tool-path . dotnet-reportgenerator-globaltool
+
+- script: .\reportgenerator -reports:$(Build.SourcesDirectory)\test\**\coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)\coverlet\reports -reporttypes:"HtmlInline_AzurePipelines;Cobertura"
+  displayName: Create reports 
 
 - task: PublishCodeCoverageResults@1
+  displayName: 'Publish code coverage'
   inputs:
-    codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '$(Build.SourcesDirectory)/TestResults/Coverage/*cobertura.xml'
-    reportDirectory: '($(Build.SourcesDirectory)/TestResults/Coverage'
+    codeCoverageTool: Cobertura
+    summaryFileLocation: $(Build.SourcesDirectory)/coverlet/reports/Cobertura.xml  
