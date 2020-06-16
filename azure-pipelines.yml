@@ -29,6 +29,7 @@ steps:
     configuration: '$(buildConfiguration)'
 
 - task: DotNetCoreCLI@2 
+  displayName: 'Run Tests'
   inputs:
     command: 'test'
     projects: 'test/**/*.csproj'
@@ -36,7 +37,7 @@ steps:
     nobuild: true
     
 - task: DotNetCoreCLI@2
-  displayName: Install ReportGenerator tool
+  displayName: 'Install ReportGenerator tool'
   inputs:
     command: custom
     custom: tool
