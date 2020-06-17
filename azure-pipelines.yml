@@ -50,4 +50,15 @@ steps:
   displayName: 'Publish code coverage'
   inputs:
     codeCoverageTool: Cobertura
-    summaryFileLocation: $(Build.SourcesDirectory)/coverlet/reports/Cobertura.xml  
+    summaryFileLocation: $(Build.SourcesDirectory)/coverlet/reports/Cobertura.xml
+
+- task: BuildQualityChecks@7
+  displayName: 'Quality Checks'
+  inputs:
+    checkWarnings: true
+    warningFailOption: 'build'
+    showStatistics: true
+    checkCoverage: true
+    coverageFailOption: 'fixed'
+    coverageType: 'branches'
+    coverageThreshold: '90'
