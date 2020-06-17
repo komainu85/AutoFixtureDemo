@@ -61,4 +61,4 @@ steps:
     checkCoverage: true
     coverageFailOption: 'fixed'
     coverageType: 'branches'
-    coverageThreshold: '90'
+    coverageThreshold: '80'
