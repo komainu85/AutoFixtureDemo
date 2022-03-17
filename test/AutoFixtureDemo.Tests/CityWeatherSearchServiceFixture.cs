@@ -52,7 +52,8 @@ namespace AutoFixtureDemo.Tests
             f.Inject<IEnumerable<Weather>>(weather);
         };
 
-        [Theory, AutoNSubstituteData]
+        [Theory]
+        [AutoNSubstituteData]
         public void Ctor_Guarded(GuardClauseAssertion assertion)
         {
             // Act / Assert
@@ -77,7 +78,7 @@ namespace AutoFixtureDemo.Tests
             // Act
             Func<CityWeather> act = () => sut.GetCityWeather(cityName);
 
-            act.Should().NotThrow();
+            act.Should().NotThrow<ArgumentNullException>();
         }
 
         // Frozen intro
@@ -140,7 +141,7 @@ namespace AutoFixtureDemo.Tests
 
         [Theory]
         [AutoNSubstituteData(nameof(FullDayOfWeatherData))]
-        public void SearchAsync_WithWeatherResults_NoWeatherReturned(
+        public void SearchAsync_WithWeatherResults_WeatherReturned(
             CityWeatherSearchService sut,
             IEnumerable<Weather> weather,
             string cityName)

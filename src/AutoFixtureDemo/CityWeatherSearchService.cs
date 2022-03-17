@@ -7,14 +7,14 @@ namespace AutoFixtureDemo
     public class CityWeatherSearchService
     {
         private readonly IWeatherService _weatherService;
-        private readonly ICityRepository _cityService;
+        private readonly ICityRepository _cityRepository;
 
         public CityWeatherSearchService(
             IWeatherService weatherService,
-            ICityRepository cityService)
+            ICityRepository cityRepository)
         {
             _weatherService = weatherService ?? throw new ArgumentNullException(nameof(weatherService));
-            _cityService = cityService ?? throw new ArgumentNullException(nameof(cityService));
+            _cityRepository = cityRepository ?? throw new ArgumentNullException(nameof(cityRepository));
         }
 
         public CityWeather GetCityWeather(string cityName)
@@ -22,7 +22,7 @@ namespace AutoFixtureDemo
             if (string.IsNullOrEmpty(cityName))
                 throw new ArgumentNullException(nameof(cityName));
 
-            var city = _cityService.GetCity(cityName);
+            var city = _cityRepository.GetCity(cityName);
 
             if (city != null)
             {

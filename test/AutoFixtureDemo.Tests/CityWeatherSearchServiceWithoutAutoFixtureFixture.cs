@@ -36,7 +36,7 @@ namespace AutoFixtureDemo.Tests
         {
             // Act / Assert
             Assert.Throws<ArgumentNullException>(() => new CityWeatherSearchService(new WeatherService(), null))
-                .Message.Should().Be("Value cannot be null. (Parameter 'cityService')");
+                .Message.Should().Be("Value cannot be null. (Parameter 'cityRepository')");
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace AutoFixtureDemo.Tests
         }
 
         [Fact]
-        public void SearchAsync_WitNoWeatherResults_NoWeatherReturned()
+        public void SearchAsync_WithNoWeatherResults_NoWeatherReturned()
         {
             // Arrange
             var city = new City()

@@ -17,7 +17,7 @@ namespace AutoFixtureDemo.Tests
             //f.Customizations.Add(new MethodInvoker(new GreedyConstructorQuery()));
 
             //// Customise how Country is created by setting a property /
-            f.Customize<Country>(x => x.With(p => p.Name, "United Kingdom"));
+            // f.Customize<Country>(x => x.With(p => p.Name, "United Kingdom"));
 
             //// Customise how country is created by specifying an action to run.
             //f.Customize<Country>(x => x.Do(a => a.States.Add("My State")));
@@ -26,19 +26,18 @@ namespace AutoFixtureDemo.Tests
             //f.Customize<Country>(x => x.FromFactory(() => new Country()));
 
             //// Creates an instance of a type.
-            //var testString = f.Create<string>();
+            // var testString = f.Create<string>();
 
             //// You need to inject a type that you have created so AutoFixture can use it.
             //// When you ask for an instance of a type you will always get the one you have injected.
-            //f.Inject(testString);
+            // f.Inject(testString);
 
             //// Create a enumerable of generated instances of a type
-            //var integers = f.CreateMany<string>();
+            //var strings = f.CreateMany<string>();
 
             //// Creates a one off new object, ignores any customisations previously registered for the type.
             //var instance = f.Build<Country>().With(p => p.Id, Guid.NewGuid());
         };
-
 
         [Theory]
         [AutoNSubstituteData]
