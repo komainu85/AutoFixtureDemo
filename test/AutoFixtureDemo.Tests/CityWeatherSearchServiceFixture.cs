@@ -103,7 +103,7 @@ namespace AutoFixtureDemo.Tests
            [Frozen] IWeatherService weatherService,
            CityWeatherSearchService sut,
            City city,
-           IEnumerable<Weather> weather,
+       IEnumerable<Weather> weather,
            string cityName)
         {
             //Arrange 

@@ -5,6 +5,7 @@ using AutoFixtureDemo.Models;
 using AutoFixtureDemo.Services;
 using NSubstitute;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -61,6 +62,7 @@ namespace AutoFixtureDemo.Tests
             [Frozen] IDatabaseProvider databaseProvider,
             CityRepository sut,
             string cityName,
+            [CollectionSize(5)] IEnumerable<Country> countries,
             Fixture fixture)
         {
             //Arrange
