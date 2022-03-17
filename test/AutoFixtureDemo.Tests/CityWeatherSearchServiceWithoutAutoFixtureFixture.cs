@@ -1,7 +1,7 @@
 using AutoFixtureDemo.Models;
 using AutoFixtureDemo.Services;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +12,15 @@ namespace AutoFixtureDemo.Tests
     public class CityWeatherSearchServiceWithoutAutoFixtureFixture
     {
         private readonly CityWeatherSearchService _sut;
-        private readonly Mock<ICityRepository> _cityRepository;
-        private readonly Mock<IWeatherService> _weatherService;
+        private readonly ICityRepository _cityRepository;
+        private readonly IWeatherService _weatherService;
 
         public CityWeatherSearchServiceWithoutAutoFixtureFixture()
         {
-            _cityRepository = new Mock<ICityRepository>();
-            _weatherService = new Mock<IWeatherService>();
+            _cityRepository = Substitute.For<ICityRepository>();
+            _weatherService = Substitute.For<IWeatherService>();
 
-            _sut = new CityWeatherSearchService(_weatherService.Object, _cityRepository.Object);
+            _sut = new CityWeatherSearchService(_weatherService, _cityRepository);
         }
 
         [Fact]
@@ -65,13 +65,13 @@ namespace AutoFixtureDemo.Tests
             //Arrange
             var cityName = "MyCity";
 
-            _cityRepository.Setup(x => x.GetCity(It.Is<string>(s => s.Equals(cityName))))
+            _cityRepository.GetCity(Arg.Is<string>(s => s.Equals(cityName)))
                 .Returns(new City());
 
             // Act
             _sut.GetCityWeather(cityName);
 
-            _cityRepository.Verify(v => v.GetCity(It.Is<string>(m => m == cityName)), Times.Once);
+            _cityRepository.Received(1).GetCity(Arg.Is<string>(m => m == cityName));
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace AutoFixtureDemo.Tests
                 Id = new Guid()
             };
 
-            _cityRepository.Setup(s => s.GetCity(It.Is<string>(m => m == city.Name)))
+            _cityRepository.GetCity(Arg.Is<string>(m => m == city.Name))
                 .Returns(city);
 
             var weather = new List<Weather>();
@@ -94,15 +94,15 @@ namespace AutoFixtureDemo.Tests
                 weather.Add(new Weather(DateTime.Now.AddHours(i), 12.2f));
             }
 
-            _weatherService.Setup(s => s.GetHourlyWeather(It.Is<Guid>(m => m == city.Id)))
+            _weatherService.GetHourlyWeather(Arg.Is<Guid>(m => m == city.Id))
                 .Returns(weather);
 
             // Act
             var cityWeather = _sut.GetCityWeather(city.Name);
 
             // Assert
-            _cityRepository.Verify(v => v.GetCity(It.Is<string>(m => m == city.Name)), Times.Once);
-            _weatherService.Verify(v => v.GetHourlyWeather(It.Is<Guid>(m => m == city.Id)));
+            _cityRepository.Received(1).GetCity(Arg.Is<string>(m => m == city.Name));
+            _weatherService.Received(1).GetHourlyWeather(Arg.Is<Guid>(m => m == city.Id));
 
             cityWeather.City.Should().Be(city);
             cityWeather.HourlyWeather.Should().BeSameAs(weather);
@@ -118,10 +118,10 @@ namespace AutoFixtureDemo.Tests
                 Id = new Guid()
             };
 
-            _cityRepository.Setup(s => s.GetCity(It.Is<string>(m => m == city.Name)))
+            _cityRepository.GetCity(Arg.Is<string>(m => m == city.Name))
                 .Returns(city);
 
-            _weatherService.Setup(c => c.GetHourlyWeather(It.IsAny<Guid>()))
+            _weatherService.GetHourlyWeather(Arg.Any<Guid>())
                 .Returns(Enumerable.Empty<Weather>());
 
             // Act
@@ -149,10 +149,10 @@ namespace AutoFixtureDemo.Tests
                 weather.Add(new Weather(DateTime.Now.AddHours(i), 12.2f));
             }
 
-            _weatherService.Setup(c => c.GetHourlyWeather(It.IsAny<Guid>()))
+            _weatherService.GetHourlyWeather(Arg.Any<Guid>())
                 .Returns(weather);
 
-            _cityRepository.Setup(s => s.GetCity(It.Is<string>(m => m == city.Name)))
+            _cityRepository.GetCity(Arg.Is<string>(m => m == city.Name))
                 .Returns(city);
 
             // Act

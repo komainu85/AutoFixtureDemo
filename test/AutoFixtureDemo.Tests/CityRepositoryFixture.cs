@@ -1,10 +1,9 @@
 ﻿using AutoFixture;
-using AutoFixture.Kernel;
 using AutoFixture.Xunit2;
 using AutoFixtureDemo.Database;
 using AutoFixtureDemo.Models;
 using AutoFixtureDemo.Services;
-using Moq;
+using NSubstitute;
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -42,9 +41,9 @@ namespace AutoFixtureDemo.Tests
 
 
         [Theory]
-        [AutoMoqData]
+        [AutoNSubstituteData]
         public async Task SaveCity_WithValidData_CallsSaveAsync(
-            [Frozen]Mock<IDatabaseProvider> databaseProvider,
+            [Frozen] IDatabaseProvider databaseProvider,
             CityRepository sut,
             string cityName,
             Country country)
@@ -53,14 +52,14 @@ namespace AutoFixtureDemo.Tests
             await sut.SaveCity(cityName, country);
 
             // Assert
-            databaseProvider.Verify(x => x.SaveAsync(), Times.Once);
+            await databaseProvider.Received(1).SaveAsync();
         }
 
         //Using Fixture within a test
         [Theory]
-        [AutoMoqData]
+        [AutoNSubstituteData]
         public async Task SaveCity_WithValidData_CallsAddCity(
-            [Frozen] Mock<IDatabaseProvider> databaseProvider,
+            [Frozen] IDatabaseProvider databaseProvider,
             CityRepository sut,
             string cityName,
             Fixture fixture)
@@ -72,7 +71,7 @@ namespace AutoFixtureDemo.Tests
             await sut.SaveCity(cityName, country);
 
             // Assert
-            databaseProvider.Verify(x => x.AddCity(It.Is<string>(m => m.Equals(cityName)), It.Is<Country>(m => m.Equals(country))), Times.Once);
+            databaseProvider.Received(1).AddCity(Arg.Is<string>(m => m.Equals(cityName)), Arg.Is<Country>(m => m.Equals(country)));
         }
     }
 }

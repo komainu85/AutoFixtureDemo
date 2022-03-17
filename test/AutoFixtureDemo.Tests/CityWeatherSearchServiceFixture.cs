@@ -4,7 +4,7 @@ using AutoFixture.Xunit2;
 using AutoFixtureDemo.Models;
 using AutoFixtureDemo.Services;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +14,21 @@ namespace AutoFixtureDemo.Tests
 {
     public class CityWeatherSearchServiceFixture
     {
+        public static Action<IFixture> AutoSetup => f =>
+        {
+            var cityRepository = f.Freeze<ICityRepository>();
+
+            cityRepository.GetCity(Arg.Any<string>())
+                .Returns(f.Create<City>());
+
+            f.Inject(cityRepository);
+        };
+
         public static Action<IFixture> NoWeatherData => f =>
         {
-            var weatherService = new Mock<IWeatherService>();
+            var weatherService = f.Freeze<IWeatherService>();
 
-            weatherService.Setup(c => c.GetHourlyWeather(It.IsAny<Guid>()))
+            weatherService.GetHourlyWeather(Arg.Any<Guid>())
                 .Returns(Enumerable.Empty<Weather>());
 
             f.Inject(weatherService);
@@ -33,16 +43,16 @@ namespace AutoFixtureDemo.Tests
                 weather.Add(new Weather(DateTime.Now.AddHours(i), 12.2f));
             }
 
-            var weatherService = new Mock<IWeatherService>();
+            var weatherService = f.Freeze<IWeatherService>();
 
-            weatherService.Setup(c => c.GetHourlyWeather(It.IsAny<Guid>()))
+            weatherService.GetHourlyWeather(Arg.Any<Guid>())
                 .Returns(weather);
 
             f.Inject(weatherService);
             f.Inject<IEnumerable<Weather>>(weather);
         };
 
-        [Theory, AutoMoqData]
+        [Theory, AutoNSubstituteData]
         public void Ctor_Guarded(GuardClauseAssertion assertion)
         {
             // Act / Assert
@@ -50,7 +60,7 @@ namespace AutoFixtureDemo.Tests
         }
 
         [Theory]
-        [AutoMoqData]
+        [AutoNSubstituteData]
         public void Methods_Guarded(GuardClauseAssertion assertion)
         {
             // Arrange
@@ -59,7 +69,7 @@ namespace AutoFixtureDemo.Tests
 
         // Simple object creation
         [Theory]
-        [AutoMoqData]
+        [AutoNSubstituteData]
         public void GetCityWeather_WithValidCityName_DoesntThrow(
             CityWeatherSearchService sut,
             string cityName)
@@ -72,42 +82,42 @@ namespace AutoFixtureDemo.Tests
 
         // Frozen intro
         [Theory]
-        [AutoMoqData]
+        [AutoNSubstituteData]
         public void GetCityWeather_WithValidCityName_CallsRepository(
-            [Frozen] Mock<ICityRepository> cityRepository,
+            [Frozen] ICityRepository cityRepository,
             CityWeatherSearchService sut,
             string cityName)
         {
             // Act
             sut.GetCityWeather(cityName);
 
-            cityRepository.Verify(v => v.GetCity(It.Is<string>(m => m == cityName)), Times.Once);
+            cityRepository.Received(1).GetCity(Arg.Is<string>(m => m == cityName));
         }
 
         // complex object creation
         [Theory]
-        [AutoMoqData]
+        [AutoNSubstituteData]
         public void GetCityWeather_WithMatchingResults_ReturnsResults(
-           [Frozen] Mock<ICityRepository> cityRepository,
-           [Frozen] Mock<IWeatherService> weatherService,
+           [Frozen] ICityRepository cityRepository,
+           [Frozen] IWeatherService weatherService,
            CityWeatherSearchService sut,
            City city,
            IEnumerable<Weather> weather,
            string cityName)
         {
             //Arrange 
-            cityRepository.Setup(s => s.GetCity(It.Is<string>(m => m == cityName)))
+            cityRepository.GetCity(Arg.Is<string>(m => m == cityName))
                 .Returns(city);
 
-            weatherService.Setup(s => s.GetHourlyWeather(It.Is<Guid>(m => m == city.Id)))
+            weatherService.GetHourlyWeather(Arg.Is<Guid>(m => m == city.Id))
               .Returns(weather);
 
             // Act
             var cityWeather = sut.GetCityWeather(cityName);
 
             // Assert
-            cityRepository.Verify(v => v.GetCity(It.Is<string>(m => m == cityName)), Times.Once);
-            weatherService.Verify(v => v.GetHourlyWeather(It.Is<Guid>(m => m == city.Id)));
+            cityRepository.Received(1).GetCity(Arg.Is<string>(m => m == cityName));
+            weatherService.Received(1).GetHourlyWeather(Arg.Is<Guid>(m => m == city.Id));
 
 
             cityWeather.City.Should().Be(city);
@@ -116,7 +126,7 @@ namespace AutoFixtureDemo.Tests
 
         // Named setup
         [Theory]
-        [AutoMoqData(nameof(NoWeatherData))]
+        [AutoNSubstituteData(nameof(NoWeatherData))]
         public void SearchAsync_WitNoWeatherResults_NoWeatherReturned(
               CityWeatherSearchService sut,
               string cityName)
@@ -129,7 +139,7 @@ namespace AutoFixtureDemo.Tests
         }
 
         [Theory]
-        [AutoMoqData(nameof(FullDayOfWeatherData))]
+        [AutoNSubstituteData(nameof(FullDayOfWeatherData))]
         public void SearchAsync_WithWeatherResults_NoWeatherReturned(
             CityWeatherSearchService sut,
             IEnumerable<Weather> weather,
@@ -141,6 +151,5 @@ namespace AutoFixtureDemo.Tests
             cityWeather.HourlyWeather.Should().BeSameAs(weather);
             cityWeather.City.Should().NotBeNull();
         }
-
     }
 }

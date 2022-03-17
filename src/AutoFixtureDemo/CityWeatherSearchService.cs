@@ -1,6 +1,5 @@
 ﻿using AutoFixtureDemo.Models;
 using AutoFixtureDemo.Services;
-using Microsoft.Extensions.Logging;
 using System;
 
 namespace AutoFixtureDemo
