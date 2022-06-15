@@ -81,7 +81,7 @@ namespace AutoFixtureDemo.Tests
             act.Should().NotThrow<ArgumentNullException>();
         }
 
-        // Frozen intro
+        // Frozen intro / AutoSetup
         [Theory]
         [AutoNSubstituteData]
         public void GetCityWeather_WithValidCityName_CallsRepository(
@@ -103,7 +103,7 @@ namespace AutoFixtureDemo.Tests
            [Frozen] IWeatherService weatherService,
            CityWeatherSearchService sut,
            City city,
-       IEnumerable<Weather> weather,
+           IEnumerable<Weather> weather,
            string cityName)
         {
             //Arrange 
@@ -120,7 +120,6 @@ namespace AutoFixtureDemo.Tests
             cityRepository.Received(1).GetCity(Arg.Is<string>(m => m == cityName));
             weatherService.Received(1).GetHourlyWeather(Arg.Is<Guid>(m => m == city.Id));
 
-
             cityWeather.City.Should().Be(city);
             cityWeather.HourlyWeather.Should().BeSameAs(weather);
         }
@@ -128,7 +127,7 @@ namespace AutoFixtureDemo.Tests
         // Named setup
         [Theory]
         [AutoNSubstituteData(nameof(NoWeatherData))]
-        public void SearchAsync_WitNoWeatherResults_NoWeatherReturned(
+        public void SearchAsync_WithNoWeatherResults_NoWeatherReturned(
               CityWeatherSearchService sut,
               string cityName)
         {
